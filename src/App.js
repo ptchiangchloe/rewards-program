@@ -2,7 +2,16 @@ import './App.css';
 import { customerRecord } from './customerRecord';
 import react from 'react';
 
-const Months = {
+import { Button } from '@material-ui/core';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableContainer from '@material-ui/core/TableContainer';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+import Paper from '@material-ui/core/Paper';
+
+const MONTHS = {
   '4': 'May',
   '5': 'June',
   '6': 'July'
@@ -11,14 +20,14 @@ const Months = {
 class App extends react.Component {
   state = {
     customers: [],
+    showTable: false
   }
   
   handleClick = () => {
-      console.log("return a log");
-      let customers = this.processCustomerNames();
-      let sortCustomerDataByMonth = this.sortCustomerDataByMonth();
+      let customers = this.processCustomerNameIntoArray();
       this.setState({
-        customers: customers
+        customers: customers,
+        showTable: true
       })
   }
 
@@ -51,14 +60,12 @@ class App extends react.Component {
       }
     }
 
-    console.log(customerMonth);
     return customerMonth;
   }
 
-  processCustomerNames() {
+  processCustomerNameIntoArray() {
     let customers = new Set()
     for(let i=0; i<customerRecord.length; i++) {
-      // console.log(customerRecord[i].transactionDate.getMonth());
       let name = customerRecord[i].name
       name = name.charAt(0).toUpperCase() + name.slice(1)
       customers.add(name);
@@ -78,49 +85,77 @@ class App extends react.Component {
     return sum;
   }
   
-
   render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <button onClick={this.handleClick}>
-            calculate the reward points
-          </button>
-          <table class="data-table">
-              {this.state.customers.map((name, idx) => {
-                let customerMonth = this.sortCustomerDataByMonth();
-
-                let dataByname = customerMonth.get(name);
-
-                console.log(dataByname)
-
-                return ( Object.entries(dataByname).map((entry) => {
-                  console.log(entry);
-                  return (
-                    <tr>
-                      <td>
-                        {name}
-                      </td>
-                      <td>
-                        {Months[entry[0]]}
-                      </td>
-                      <td>
-                        {entry[1][0]} points
-                      </td>
-                    </tr>
-                  )
-                })
-
-                )
-
-              })}
-            
-            <tr>500</tr>
-            <tr>1600</tr>
-          </table>
-        </header>
-      </div>
-    );
+    let customerMonth = this.sortCustomerDataByMonth();
+    if(this.state.showTable) {
+      return (
+        <div className="App">
+          <TableContainer component={Paper} className="table-container">
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell align="center">Customer Name</TableCell>
+                  <TableCell align="center">Time</TableCell>
+                  <TableCell align="center">Reward Points</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {
+                  this.state.customers.map((name, idx) => {
+                    let dataByName = customerMonth.get(name);
+                    return ( Object.entries(dataByName).map((entry) => {
+                      return (
+                        <TableRow>
+                          <TableCell align="center" className="customer-name">
+                            {name}
+                          </TableCell>
+                          <TableCell align="center">
+                            {MONTHS[entry[0]]}
+                          </TableCell>
+                          <TableCell align="center">
+                            {entry[1][0]} points
+                          </TableCell>
+                        </TableRow>
+                      )
+                    }))
+                  })
+                }
+                {
+                  this.state.customers.map((name, idx) => {
+                    let months = customerMonth.get(name);
+                    let total = 0;
+                    for(let month in months) {
+                      total += +months[month];
+                    }
+                    return (
+                      <TableRow key={idx}>
+                        <TableCell align="center" className="customer-name">
+                          {name}
+                        </TableCell>
+                        <TableCell align="center">
+                          Total
+                        </TableCell>
+                        <TableCell align="center">
+                          {total} points
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })
+                }
+              </TableBody>    
+            </Table>
+          </TableContainer>   
+        </div>
+      );
+    } else {
+      return (
+        <div className="App">
+          <Button variant="contained" onClick={this.handleClick}>
+                Calculate the reward points
+          </Button>
+        </div>
+      )
+    }
   }
 }
 
