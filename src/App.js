@@ -2,6 +2,7 @@ import './App.css';
 import { customerRecord } from './customerRecord';
 import react from 'react';
 
+// import material-ui for styling
 import { Button } from '@material-ui/core';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -31,6 +32,7 @@ class App extends react.Component {
       })
   }
 
+// Translate single transaction based object into client-month based Map object. 
   sortCustomerDataByMonth() {
     let customerMonth = new Map();
 
@@ -73,7 +75,10 @@ class App extends react.Component {
 
     return Array.from(customers);
   }
-
+  
+//receives 2 points for every dollar spent over $100 in each transaction, 
+// plus 1 point for every dollar spent over $50 in each transaction
+//(e.g. a $120 purchase = 2x$20 + 1x$50 = 90 points).
   pointCalculator(dollar) {
     let sum = 0;
     if(dollar > 50) {
@@ -85,6 +90,11 @@ class App extends react.Component {
     return sum;
   }
   
+// When the user clicks `CALCULATE THE REWARD POINTS`
+// the click handler will triger a translation from the single transaction based 
+// data set to the client-month based data set, and then the new 
+// data set will be translated into the UI values by the JSX template.
+
   render() {
     let customerMonth = this.sortCustomerDataByMonth();
     if(this.state.showTable) {
